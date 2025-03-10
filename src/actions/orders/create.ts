@@ -1,6 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { UniqueViolationError } from 'objection';
 import Order from '../../models/Order';
+import Product from '../../models/Product';
+import OrderService from "../../services/orderService";
 
 type Request = FastifyRequest<{
     Body: {
@@ -19,5 +21,7 @@ export default async (
     { body: { customer_id, items } }: Request,
     reply: FastifyReply
 ) => {
-    console.log({ customer_id, items })
+    const orderService = new OrderService({ customer_id, items })
+    const orderValueAndDiscount = await orderService.calculateOrderValue();
+    reply.send(orderValueAndDiscount)
 }
