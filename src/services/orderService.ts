@@ -1,6 +1,6 @@
 import Product from '../models/Product';
 import User from '../models/User';
-import OrderError, { ErrorCodes } from "../errors/orderError";
+import OrderError, { OrderErrorCodes } from "../errors/orderError";
 
 type OrderItem = {
     product_id: number;
@@ -34,7 +34,7 @@ export default class OrderService {
                         discount: item.discount
                     };
                 }
-                else throw new OrderError(ErrorCodes.PRODUCT_NOT_FOUND, `Product with id ${item.product_id} not found`);
+                else throw new OrderError(OrderErrorCodes.PRODUCT_NOT_FOUND, `Product with id ${item.product_id} not found`);
             }))
 
             const totalOrderValue = itemsWithPrice.reduce((acc, itemWithPrice) => acc + itemWithPrice.paid, 0)
@@ -51,7 +51,7 @@ export default class OrderService {
             };
         }
         else {
-            throw new OrderError(ErrorCodes.CUSTOMER_NOT_FOUND, `Customer with id ${this.orderData.customer_id} not found`);
+            throw new OrderError(OrderErrorCodes.CUSTOMER_NOT_FOUND, `Customer with id ${this.orderData.customer_id} not found`);
         }
     }
 }
