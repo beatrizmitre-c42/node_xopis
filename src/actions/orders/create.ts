@@ -3,6 +3,7 @@ import { UniqueViolationError } from 'objection';
 import Order from '../../models/Order';
 import Product from '../../models/Product';
 import OrderService from "../../services/orderService";
+import insertOrderWithItems from "../../services/queries/insertOrderWithItems"
 
 type Request = FastifyRequest<{
     Body: {
@@ -22,6 +23,7 @@ export default async (
     reply: FastifyReply
 ) => {
     const orderService = new OrderService({ customer_id, items })
-    const orderValueAndDiscount = await orderService.calculateOrderValue();
-    reply.send(orderValueAndDiscount)
+    const orderData = await orderService.calculateOrderValue();
+    const orderWithItems = await insertOrderWithItems(orderData)
+    reply.code(201).send(orderWithItems);
 }

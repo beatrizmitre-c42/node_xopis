@@ -1,12 +1,13 @@
 import Order from '../models/Order';
 import Product from '../models/Product';
+import User from '../models/User';
 type OrderItem = {
     product_id: number;
     quantity: number;
     discount: number;
 };
 
-type OrderData = {
+export type OrderData = {
     customer_id: number;
     items: OrderItem[];
 }
@@ -18,13 +19,38 @@ export default class OrderService {
         this.orderData = orderData;
     }
     async calculateOrderValue() {
-        const itemsWithPrice = await Promise.all(this.orderData.items.map(async (item) => {
-            const product = await Product.query().where('id', item.product_id).first();
-            return { id: item.product_id, quantity: item.quantity, total_value: item.quantity * product.price, discount: item.discount };
-        }))
-        const totalOrderValue = itemsWithPrice.reduce((acc, itemWithPrice) => acc + itemWithPrice.total_value, 0)
-        const totalDiscount = itemsWithPrice.reduce((acc, itemWithPrice) => acc + itemWithPrice.discount, 0)
+        const customer = await User.query().findById(this.orderData.customer_id);
+        if (customer) {
+            const itemsWithPrice = await Promise.all(this.orderData.items.map(async (item) => {
+                const product = await Product.query().where('id', item.product_id).first();
+                if (product) {
+                    return {
+                        product_id: item.product_id,
+                        quantity: item.quantity,
+                        tax: 0,
+                        shipping: 0,
+                        paid: item.quantity * product.price - item.discount,
+                        discount: item.discount
+                    };
+                }
+                else throw Error(`Product with id ${item.product_id} not found`);
+            }))
 
-        return { total_paid: (totalOrderValue - totalDiscount), total_discount: totalDiscount };
+            const totalOrderValue = itemsWithPrice.reduce((acc, itemWithPrice) => acc + itemWithPrice.paid, 0)
+            const totalDiscount = itemsWithPrice.reduce((acc, itemWithPrice) => acc + itemWithPrice.discount, 0)
+
+            return {
+                customer_id: this.orderData.customer_id,
+                status: 'payment_pending',
+                total_tax: 0,
+                total_shipping: 0,
+                total_discount: totalDiscount,
+                total_paid: totalOrderValue,
+                items: itemsWithPrice,
+            };
+        }
+        else {
+            throw new Error('Customer does not exist');
+        }
     }
 }
