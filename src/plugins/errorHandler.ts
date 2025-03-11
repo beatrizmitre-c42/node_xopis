@@ -2,6 +2,7 @@ import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import ApplicationError, { ApplicationErrorCodes } from '../errors/applicationError'
 import { ZodError } from "zod";
 import OrderError, { OrderErrorCodes } from '../errors/orderError'
+import { ValidationError } from "objection";
 
 
 export const errorHandler = (
@@ -26,6 +27,13 @@ export const errorHandler = (
     }
 
     if (error instanceof OrderError) {
+        return reply.code(400).send({
+            error: error.code,
+            message: error.message
+        })
+    }
+
+    if (error instanceof ValidationError) {
         return reply.code(400).send({
             error: error.code,
             message: error.message
