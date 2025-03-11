@@ -1,7 +1,7 @@
 import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
-import ApplicationError, { ErrorCodes } from '../errors/applicationError'
+import ApplicationError, { ApplicationErrorCodes } from '../errors/applicationError'
 import { ZodError } from "zod";
-import OrderError, { ErrorCodes } from '../errors/orderError'
+import OrderError, { OrderErrorCodes } from '../errors/orderError'
 
 
 export const errorHandler = (
@@ -10,14 +10,14 @@ export const errorHandler = (
     reply: FastifyReply
 ) => {
     if (error instanceof ApplicationError) {
-        if (error.code === ErrorCodes.BAD_REQUEST) {
+        if (error.code === ApplicationErrorCodes.BAD_REQUEST) {
             return reply.code(400).send({
                 error: "Bad Request",
                 message: error.message,
             });
         }
 
-        if (error.code === ErrorCodes.NOT_FOUND) {
+        if (error.code === ApplicationErrorCodes.NOT_FOUND) {
             return reply.code(404).send({
                 error: "Not Found",
                 message: error.message,

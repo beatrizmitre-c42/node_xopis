@@ -1,4 +1,4 @@
-export enum ErrorCodes {
+export enum ApplicationErrorCodes {
     BAD_REQUEST = "BAD_REQUEST",
     NOT_FOUND = "NOT_FOUND",
 }
@@ -6,7 +6,7 @@ export enum ErrorCodes {
 export default class ApplicationError extends Error {
     code: string;
 
-    constructor(code: ErrorCodes, message: string) {
+    constructor(code: ApplicationErrorCodes, message: string) {
         super(message);
         this.code = code;
     }

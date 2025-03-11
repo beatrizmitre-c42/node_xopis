@@ -22,8 +22,9 @@ export default async (
     { body: { customer_id, items } }: Request,
     reply: FastifyReply
 ) => {
+    console.log({ body: { customer_id, items } })
     const orderService = new OrderService({ customer_id, items })
     const orderData = await orderService.calculateOrderValue();
     const orderWithItems = await insertOrderWithItems(orderData)
-    reply.code(201).send(orderWithItems);
+    return reply.code(201).send(orderWithItems);
 }

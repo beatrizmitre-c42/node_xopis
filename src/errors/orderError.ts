@@ -1,4 +1,4 @@
-export enum ErrorCodes {
+export enum OrderErrorCodes {
     CUSTOMER_NOT_FOUND = 'CUSTOMER_NOT_FOUND',
     PRODUCT_NOT_FOUND = 'PRODUCT_NOT_FOUND',
 }
@@ -6,7 +6,7 @@ export enum ErrorCodes {
 export default class OrderError extends Error {
     code: string;
 
-    constructor(code: ErrorCodes, message: string) {
+    constructor(code: OrderErrorCodes, message: string) {
         super(message);
         this.code = code;
     }
