@@ -1,25 +1,15 @@
 import Product from '../models/Product';
 import User from '../models/User';
 import OrderError, { OrderErrorCodes } from "../errors/orderError";
-
-type OrderItem = {
-    product_id: number;
-    quantity: number;
-    discount: number;
-};
-
-export type OrderData = {
-    customer_id: number;
-    items: OrderItem[];
-}
+import { CreateOrderBodyType, OrderWithItemsType } from 'src/models/types'
 
 export default class OrderService {
-    orderData: OrderData
+    orderData: CreateOrderBodyType
 
-    constructor (orderData: OrderData) {
+    constructor (orderData: CreateOrderBodyType) {
         this.orderData = orderData;
     }
-    async calculateOrderValue() {
+    async calculateOrderValue():Promise<OrderWithItemsType> {
         const customer = await User.query().findById(this.orderData.customer_id);
         if (customer) {
             const itemsWithPrice = await Promise.all(this.orderData.items.map(async (item) => {
