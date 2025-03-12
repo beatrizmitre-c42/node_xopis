@@ -15,7 +15,7 @@ export default async (
 ) => {
     const orderService = new OrderService({ customer_id, items })
     const orderData = await orderService.calculateOrderValue();
-    const createdOrderWithItems = await insertOrderWithItems(orderData) as unknown as OrderWithItemsType;
+    const createdOrderWithItems = await insertOrderWithItems(orderData)
     const responseBody = buildCreateOrderResponseJson(createdOrderWithItems)
     return reply.code(201).send(responseBody);
 }
