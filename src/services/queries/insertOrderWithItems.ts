@@ -1,10 +1,10 @@
 import {transaction} from "objection";
 import Order from "../../models/Order";
 import '../../db'
-import {OrderData} from "src/services/orderService";
+import { CreateOrderBodyType } from 'src/models/types'
 
-export default async (orderData: OrderData) => {
+export default async (orderData: CreateOrderBodyType) => {
     return await transaction(Order, async (Order, knex) => {
-        return await Order.query().insertGraph(orderData)
+        return await Order.query().insertGraphAndFetch(orderData)
     })
 }
