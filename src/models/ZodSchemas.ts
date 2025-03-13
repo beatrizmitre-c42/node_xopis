@@ -5,6 +5,6 @@ export const OrderSchema = z.object({
     items: z.object({
         product_id: z.number().int().positive(),
         quantity: z.number().int().positive(),
-        discount: z.number().positive()
+        discount: z.number().nonnegative()
     }).array()
 })
