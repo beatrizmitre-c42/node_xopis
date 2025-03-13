@@ -28,7 +28,7 @@ class Order extends Model {
   created_at?: Date;
   updated_at?: Date;
 
-  items?: OrderItem[];
+  items!: OrderItem[];
 
   static get jsonSchema() {
     return {
