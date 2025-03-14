@@ -105,21 +105,56 @@ describe('CREATE action', () => {
                 ])
             )
         });
+
+        it('calculates order value correctly', async () => {
+
+            const inputWith2Products = {
+                customer_id: 1,
+                items: [
+                    {
+                        product_id: 1,
+                        quantity: 2,
+                    },
+                    {
+                        product_id: 2,
+                        quantity: 4,
+                        discount: 3.49
+                    },
+                ]
+            }
+            const response = await makeRequest(inputWith2Products);
+            const jsonResponse = response.json<Order>();
+
+            const expectedProduct1Price = 2.99 * 2
+            const expectedProduct2Price = 4.50 * 4 - 3.49
+            console.log(jsonResponse);
+            expect(jsonResponse.total_paid).toEqual(expectedProduct1Price + expectedProduct2Price);
+        });
     });
 
+    const userInput = { name: 'John Doe', email: 'john.doe@email.com' };
+    const productInput1 = {
+        name: 'Beach Ball',
+        sku: 'BCHBLL',
+        description: 'A fun and colorful beach ball.',
+        price: 2.99,
+        stock: 100,
+    };
+
+    const productInput2 = {
+        name: 'Umbrella',
+        sku: 'UMBRLL',
+        description: 'A fun and colorful umbrella.',
+        price: 4.50,
+        stock: 100,
+    };
+
     const makeRequest = async (input: Partial<CreateOrderBodyType>) => {
-        const userInput = { name: 'John Doe', email: 'john.doe@email.com' };
-        const productInput = {
-            name: 'Beach Ball',
-            sku: 'BCHBLL',
-            description: 'A fun and colorful beach ball.',
-            price: 2.99,
-            stock: 100,
-        };
-
         await User.query().insert(userInput);
-        await Product.query().insert(productInput);
+        await Product.query().insert(productInput1);
+        await Product.query().insert(productInput2);
 
+        console.log(input)
         return await server.inject({
             method: 'POST',
             url: '/orders',
@@ -186,18 +221,28 @@ describe('UPDATE action', () => {
         });
     });
 
+    const userInput = { name: 'John Doe', email: 'john.doe@email.com' };
+    const productInput1 = {
+        name: 'Beach Ball',
+        sku: 'BCHBLL',
+        description: 'A fun and colorful beach ball.',
+        price: 2.99,
+        stock: 100,
+    };
+
+    const productInput2 = {
+        name: 'Umbrella',
+        sku: 'UMBRLL',
+        description: 'A fun and colorful umbrella.',
+        price: 4.50,
+        stock: 100,
+    };
+
     const makeRequest = async (input: Partial<CreateOrderBodyType>) => {
-        const userInput = { name: 'John Doe', email: 'john.doe@email.com' };
-        const productInput = {
-            name: 'Beach Ball',
-            sku: 'BCHBLL',
-            description: 'A fun and colorful beach ball.',
-            price: 2.99,
-            stock: 100,
-        };
 
         await User.query().insert(userInput);
-        await Product.query().insert(productInput);
+        await Product.query().insert(productInput1);
+        await Product.query().insert(productInput2);
 
         return await server.inject({
             method: 'POST',

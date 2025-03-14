@@ -98,7 +98,7 @@ export default class OrderService {
                             quantity: requestOrderItem.quantity,
                             tax: 0,
                             shipping: 0,
-                            paid: requestOrderItem.quantity * product.price - requestOrderItem.discount || 0,
+                            paid: requestOrderItem.quantity * product.price - (requestOrderItem.discount || 0),
                             discount: requestOrderItem.discount || 0
                         }
                     }
@@ -117,7 +117,7 @@ export default class OrderService {
                         tax: 0,
                         shipping: 0,
                         discount: requestOrderItem.discount|| 0,
-                        paid: requestOrderItem.quantity * product.price - requestOrderItem.discount || 0
+                        paid: requestOrderItem.quantity * product.price - (requestOrderItem.discount || 0)
                     }
                 }
                 else throw new OrderError(OrderErrorCodes.PRODUCT_NOT_FOUND, `Product not found`)
