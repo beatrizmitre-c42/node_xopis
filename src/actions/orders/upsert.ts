@@ -4,7 +4,7 @@ import Order from "src/models/Order";
 import { UpsertOrderBodyType } from 'src/models/types'
 import buildCreateOrderResponseJson from "src/services/buildCreateOrderResponseJson";
 import upsertOrderWithItems from "src/services/queries/upsertOrderWithItems";
-import {OrderToUpsert} from "../../services/orderService";
+import {OrderToUpsert} from "src/services/orderService";
 
 type Request = FastifyRequest<{
     Body: UpsertOrderBodyType

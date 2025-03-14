@@ -18,13 +18,13 @@ type OrderItemToBuildJson = {
 
 export type OrderToUpsert = {
     customer_id?: number
-    status?: OrderStatus | undefined;
+    status?: OrderStatus
     total_tax?: number;
     total_shipping?: number;
     items: (OrderItem | OrderItemToBuildJson)[];
     total_paid: number;
     total_discount: number;
-    id?: number | undefined;
+    id?: number
 }
 
 type OrderValuesToBuildJson = { total_paid: number, total_discount: number }
@@ -52,7 +52,7 @@ export default class OrderService {
 
     async findRequestBodyProducts() {
         if (this.orderData.items && this.orderData.items.length > 0) {
-            await this.checkIfRepeatedBodyOrderProducts()
+            this.checkIfRepeatedBodyOrderProducts()
             return await Promise.all(this.orderData.items.map(async (product) => {
                 const existingProduct = await Product.query().findById(product.product_id)
                 if (existingProduct) {
@@ -62,7 +62,7 @@ export default class OrderService {
         }
     }
 
-    async checkIfRepeatedBodyOrderProducts() {
+    checkIfRepeatedBodyOrderProducts() {
         if (this.orderData.items && this.orderData.items.length > 0) {
             const productIds = this.orderData.items.map((item) => item.product_id)
             const uniqueProductIds = [...new Set(productIds)]
@@ -71,6 +71,7 @@ export default class OrderService {
             }
         }
     }
+
     async buildOrderItemsArray():Promise<(OrderItemToBuildJson | OrderItem)[]> {
         const order = await this.findOrder();
         const requestOrderItems = this.orderData.items
@@ -127,7 +128,7 @@ export default class OrderService {
     }
 
 
-    calculateTotalOrderValue(items:(OrderItemToBuildJson | OrderItem)[] | undefined) {
+    calculateTotalOrderValue(items:(OrderItemToBuildJson | OrderItem)[]) {
         if (items !== undefined) {
             const totalOrderValue = items.reduce((acc, item:(OrderItem | OrderItemToBuildJson)) => acc + item.paid, 0)
             const totalDiscount = items.reduce((acc, item:(OrderItem | OrderItemToBuildJson)) => acc + item.discount, 0)
@@ -146,7 +147,7 @@ export default class OrderService {
         else return OrderStatus.PaymentPending
     }
 
-    async buildUpsertOrderJson(orderValues:OrderValuesToBuildJson, items:(OrderItemToBuildJson | OrderItem)[] | undefined) {
+    async buildUpsertOrderJson(orderValues:OrderValuesToBuildJson, items:(OrderItemToBuildJson | OrderItem)[]) {
         const orderStatus = await this.getUpsertOrderStatus()
         return {
             ...(this.orderData.id && { id : this.orderData.id }),
