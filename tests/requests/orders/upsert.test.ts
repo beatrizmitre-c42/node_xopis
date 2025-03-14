@@ -2,6 +2,8 @@ import 'tests/setup';
 import server from 'src/server';
 import { LightMyRequestResponse } from 'fastify';
 import Order from "../../../src/models/Order";
+import Product from "../../../src/models/Product";
+import User from "../../../src/models/User";
 import { CreateOrderBodyType } from 'src/models/types'
 
 describe('CREATE action', () => {
@@ -116,18 +118,9 @@ describe('CREATE action', () => {
             stock: 100,
         };
 
-        await server.inject({
-            method: 'POST',
-            url: '/users',
-            body: userInput,
-        });
-        await server.inject({
-            method: 'POST',
-            url: '/products',
-            body: productInput,
-        });
+        await User.query().insert(userInput);
+        await Product.query().insert(productInput);
 
-        console.log(input)
         return await server.inject({
             method: 'POST',
             url: '/orders',
