@@ -13,7 +13,6 @@ describe('CREATE action', () => {
             {
                 product_id: 1,
                 quantity: 2,
-                discount: 1
             }
         ]
     }
@@ -105,6 +104,85 @@ describe('CREATE action', () => {
                     })
                 ])
             )
+        });
+    });
+
+    const makeRequest = async (input: Partial<CreateOrderBodyType>) => {
+        const userInput = { name: 'John Doe', email: 'john.doe@email.com' };
+        const productInput = {
+            name: 'Beach Ball',
+            sku: 'BCHBLL',
+            description: 'A fun and colorful beach ball.',
+            price: 2.99,
+            stock: 100,
+        };
+
+        await User.query().insert(userInput);
+        await Product.query().insert(productInput);
+
+        return await server.inject({
+            method: 'POST',
+            url: '/orders',
+            body: input,
+        });
+    }
+})
+
+describe('UPDATE action', () => {
+    const validInput: CreateOrderBodyType = {
+        customer_id: 1,
+        items: [
+            {
+                product_id: 1,
+                quantity: 2,
+                discount: 1
+            }
+        ]
+    }
+
+    describe('when the input is valid', () => {
+        const input = validInput;
+
+        it('changes order status', async () => {
+
+            const response = await makeRequest(input);
+            const orderInfo = await response.json()
+
+            const upsertInput = {
+                id: orderInfo.id,
+                customer_id: orderInfo.customer_id,
+                status: 'approved',
+                items: orderInfo.items,
+            }
+            const upsertResponse = await server.inject({
+                method: 'POST',
+                url: '/orders',
+                body: upsertInput,
+            });
+            const parsedUpsertResponse = await upsertResponse.json();
+            expect(parsedUpsertResponse.status).toEqual('approved')
+            expect(parsedUpsertResponse.id).toEqual(orderInfo.id)
+        });
+
+        it('removes order items', async () => {
+
+            const response = await makeRequest(input);
+            const orderInfo = await response.json()
+
+            const upsertInput = {
+                id: orderInfo.id,
+                customer_id: orderInfo.customer_id,
+                status: 'approved',
+                items: [],
+            }
+            const upsertResponse = await server.inject({
+                method: 'POST',
+                url: '/orders',
+                body: upsertInput,
+            });
+            const parsedUpsertResponse = await upsertResponse.json();
+            expect(parsedUpsertResponse.items).toEqual([])
+            expect(parsedUpsertResponse.id).toEqual(orderInfo.id)
         });
     });
 

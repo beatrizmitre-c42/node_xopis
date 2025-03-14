@@ -87,8 +87,8 @@ export default class OrderService {
                     const existingOrderItem = existingOrderItems.find((existingOrderItem) => existingOrderItem.product_id === requestOrderItem.product_id)
                     if (product && existingOrderItem) {
                         existingOrderItem.quantity = requestOrderItem.quantity
-                        existingOrderItem.discount = requestOrderItem.discount
-                        existingOrderItem.paid = existingOrderItem.quantity * product.price - existingOrderItem.discount
+                        existingOrderItem.discount = requestOrderItem.discount || 0
+                        existingOrderItem.paid = existingOrderItem.quantity * product.price - existingOrderItem.discount || 0
                         delete existingOrderItem.updated_at
                         delete existingOrderItem.created_at
                         return {...existingOrderItem}
@@ -98,8 +98,8 @@ export default class OrderService {
                             quantity: requestOrderItem.quantity,
                             tax: 0,
                             shipping: 0,
-                            paid: requestOrderItem.quantity * product.price - requestOrderItem.discount,
-                            discount: requestOrderItem.discount
+                            paid: requestOrderItem.quantity * product.price - requestOrderItem.discount || 0,
+                            discount: requestOrderItem.discount || 0
                         }
                     }
                     else throw new OrderError(OrderErrorCodes.PRODUCT_NOT_FOUND, `Product not found`)
@@ -116,8 +116,8 @@ export default class OrderService {
                         quantity: requestOrderItem.quantity,
                         tax: 0,
                         shipping: 0,
-                        paid: requestOrderItem.quantity * product.price - requestOrderItem.discount,
-                        discount: requestOrderItem.discount
+                        discount: requestOrderItem.discount|| 0,
+                        paid: requestOrderItem.quantity * product.price - requestOrderItem.discount || 0
                     }
                 }
                 else throw new OrderError(OrderErrorCodes.PRODUCT_NOT_FOUND, `Product not found`)
