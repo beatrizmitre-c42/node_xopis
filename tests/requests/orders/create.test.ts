@@ -2,7 +2,7 @@ import 'tests/setup';
 import server from 'src/server';
 import { LightMyRequestResponse } from 'fastify';
 import Order from "../../../src/models/Order";
-import { CreateOrderBodyType, OrderWithItemsType } from 'src/models/types'
+import { CreateOrderBodyType } from 'src/models/types'
 
 describe('CREATE action', () => {
     const validInput: CreateOrderBodyType = {
@@ -38,7 +38,7 @@ describe('CREATE action', () => {
         it('returns the created order', async () => {
             const response = await makeRequest(input);
 
-            const jsonResponse = response.json<OrderWithItemsType>();
+            const jsonResponse = response.json<Order>();
             expect(jsonResponse).toEqual(
                 expect.objectContaining({
                     id: expect.any(Number),
@@ -83,7 +83,7 @@ describe('CREATE action', () => {
         it('returns the created order', async () => {
             const response = await makeRequest(input);
 
-            const jsonResponse = response.json<OrderWithItemsType>();
+            const jsonResponse = response.json<Order>();
             expect(jsonResponse).toEqual(
                 expect.objectContaining({
                     id: expect.any(Number),
@@ -127,6 +127,7 @@ describe('CREATE action', () => {
             body: productInput,
         });
 
+        console.log(input)
         return await server.inject({
             method: 'POST',
             url: '/orders',
