@@ -127,7 +127,6 @@ describe('CREATE action', () => {
 
             const expectedProduct1Price = 2.99 * 2
             const expectedProduct2Price = 4.50 * 4 - 3.49
-            console.log(jsonResponse);
             expect(jsonResponse.total_paid).toEqual(expectedProduct1Price + expectedProduct2Price);
         });
     });
@@ -154,7 +153,6 @@ describe('CREATE action', () => {
         await Product.query().insert(productInput1);
         await Product.query().insert(productInput2);
 
-        console.log(input)
         return await server.inject({
             method: 'POST',
             url: '/orders',
@@ -218,6 +216,75 @@ describe('UPDATE action', () => {
             const parsedUpsertResponse = await upsertResponse.json();
             expect(parsedUpsertResponse.items).toEqual([])
             expect(parsedUpsertResponse.id).toEqual(orderInfo.id)
+        });
+    });
+
+    describe('when the input is not valid', () => {
+        const input = validInput;
+
+        it(`throws error on attempt of changing order with 'approved' status`, async () => {
+
+            const response = await makeRequest(input);
+            const orderInfo = await response.json()
+
+            const upsertInput = {
+                id: orderInfo.id,
+                customer_id: orderInfo.customer_id,
+                status: 'approved',
+                items: orderInfo.items,
+            }
+            const upsertResponse = await server.inject({
+                method: 'POST',
+                url: '/orders',
+                body: upsertInput,
+            });
+
+            const newUpsertInput = {
+                id: orderInfo.id,
+                customer_id: orderInfo.customer_id,
+                status: 'payment_pending',
+                items: [],
+            }
+
+            const newUpsertResponse = await server.inject({
+                method: 'POST',
+                url: '/orders',
+                body: newUpsertInput,
+            });
+
+            expect(newUpsertResponse.statusCode).toBe(400)
+        });
+
+        it(`throws error if different items contain the same product`, async () => {
+
+            const response = await makeRequest(input);
+            const orderInfo = await response.json()
+
+            const upsertInput = {
+                id: orderInfo.id,
+                customer_id: orderInfo.customer_id,
+                status: 'approved',
+                items: [
+                    {
+                        product_id: 1,
+                        quantity: 2,
+                    },
+                    {
+                        product_id: 1,
+                        quantity: 4,
+                        discount: 3.49
+                    },
+                ]
+            }
+            const upsertResponse = await server.inject({
+                method: 'POST',
+                url: '/orders',
+                body: upsertInput,
+            });
+
+            const parsedUpsertResponse = await upsertResponse.json()
+            expect(parsedUpsertResponse.message).toBe(`The order cannot have the same product in different items.`)
+            expect(upsertResponse.statusCode).toBe(400)
         });
     });
 
