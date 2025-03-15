@@ -1,20 +1,8 @@
-export type OrderWithItemsType = {
-    id?: number;
-    total_paid: number;
-    total_discount: number;
-    status: string;
-    customer_id: number;
-    total_tax?: 0,
-    total_shipping?: 0,
-    items: OrderItemType[];
-    created_at?: Date;
-    updated_at?: Date;
-}
+import Order from "../models/Order";
+import OrderItem from "../models/OrderItem";
 
-export type OrderItemType = {
-    product_id: number;
-    quantity: number;
-    discount: number;
+export type CreateOrderBodyType = {
+    customer_id: number,
+    items: Partial<OrderItem>[]
 }
-
-export type CreateOrderBodyType = Pick<OrderWithItemsType, 'customer_id' | 'items'>
+export type UpsertOrderBodyType = Partial<Pick<Order, 'customer_id' | 'id' | 'status' | 'items'>>

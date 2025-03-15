@@ -1,8 +1,8 @@
 import { FastifyInstance } from 'fastify';
-import orderCreate from '../actions/orders/create';
+import orderUpsert from '../actions/orders/upsert';
 import { validate } from '../dtos/validate'
 import { OrderSchema } from "src/models/ZodSchemas";
 
 export default async function orderRoutes(server: FastifyInstance) {
-  server.post('/', { preHandler: validate(OrderSchema), handler: orderCreate });
+  server.post('/', { preHandler: validate(OrderSchema), handler: orderUpsert });
 }
