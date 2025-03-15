@@ -88,6 +88,18 @@ class Order extends Model {
       }
     };
   }
+
+  async calculateTotalValueAndDiscount() {
+    const items = await this.$relatedQuery('items');
+    if (items.length === 0) {
+      return { total_paid: 0, total_discount: 0 }
+    } else {
+      const totalOrderValue = items.reduce((acc, item:(OrderItem)) => acc + item.paid, 0)
+      const totalDiscount = items.reduce((acc, item:(OrderItem)) => acc + item.discount, 0)
+      return { total_paid: totalOrderValue, total_discount: totalDiscount }
+    }
+  }
 }
+
 
 export default Order;
