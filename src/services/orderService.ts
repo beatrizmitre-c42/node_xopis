@@ -45,8 +45,7 @@ export default class OrderService {
 
     async findCustomer() {
         if (this.orderData.customer_id) {
-            const customer = await User.query().findById(this.orderData.customer_id);
-            if (customer) { return customer } else { throw new OrderError(OrderErrorCodes.CUSTOMER_NOT_FOUND, `Customer with id ${this.orderData.customer_id} not found`)}
+            await User.query().findById(this.orderData.customer_id).throwIfNotFound({type: OrderErrorCodes.CUSTOMER_NOT_FOUND, message: `Customer with id ${this.orderData.customer_id} not found`})
         }
     }
 
@@ -54,10 +53,7 @@ export default class OrderService {
         if (this.orderData.items && this.orderData.items.length > 0) {
             this.checkIfRepeatedBodyOrderProducts()
             return await Promise.all(this.orderData.items.map(async (product) => {
-                const existingProduct = await Product.query().findById(product.product_id)
-                if (existingProduct) {
-                    return existingProduct;
-                } else { throw new OrderError(OrderErrorCodes.PRODUCT_NOT_FOUND, `Product with id ${product.product_id} not found`) }
+                return await Product.query().findById(product.product_id).throwIfNotFound({type: OrderErrorCodes.PRODUCT_NOT_FOUND, message: `Product with id ${product.product_id} not found`})
             }))
         }
     }

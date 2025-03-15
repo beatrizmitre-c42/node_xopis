@@ -2,7 +2,8 @@ import { FastifyError, FastifyReply, FastifyRequest } from "fastify";
 import ApplicationError, { ApplicationErrorCodes } from '../errors/applicationError'
 import { ZodError } from "zod";
 import OrderError, { OrderErrorCodes } from '../errors/orderError'
-import { ValidationError } from "objection";
+import { ValidationError, NotFoundError } from "objection";
+import User from 'src/models/User'
 
 
 export const errorHandler = (
@@ -48,6 +49,10 @@ export const errorHandler = (
                 return { field: issue.path.join(`, `), message: issue.message };
             })
         })
+    }
+
+    if (error instanceof NotFoundError) {
+        return reply.code(400).send({ error: error.data.type, message: error.data.message });
     }
 
     return reply.status(500).send({
